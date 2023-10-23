@@ -1,19 +1,17 @@
+"""Example of usage."""
 import asyncio
 import logging
 
 from aiohttp import ClientError, ClientSession
 
-from accuweather import (
-    AccuWeather,
-    ApiError,
-    InvalidApiKeyError,
-    InvalidCoordinatesError,
-    RequestsExceededError,
-)
 import socket
 import requests
 from ip2geotools.databases.noncommercial import DbIpCity
 from geopy.distance import distance
+
+from pyowm import OWM
+from pyowm.utils import config
+from pyowm.utils import timestamps
 
 def get_ip_address():
     url = 'https://api.ipify.org'
@@ -39,54 +37,21 @@ print(result[1])
 latitude = result[0]
 longitude = result[1]
 
-
-#cordy i api key (cordy zostają te same chyba że mamy sposób na wczytywanie obecnych)
-#ustawione na Katowice EDIT: jest już skrypt do generowania geo
 #kordy Katowic zostawione w komentarzu dla testów
 #LATITUDE = 50.25833
 #LONGITUDE = 19.0275
 
-LATITUDE = latitude
-LONGITUDE = longitude
-API_KEY = "d8SNarC0KGzK45AAAZ9PAS1lzrLYm21U"
+owm = OWM('5df8093e4dcdd9170a57da1b444e4c6d')
+mgr = owm.weather_manager()
 
-logging.basicConfig(level=logging.DEBUG)
-
-
-async def main():
-    """Run main function."""
-    async with ClientSession() as websession:
-        try:
-            accuweather = AccuWeather(
-                API_KEY,
-                websession,
-                latitude=LATITUDE,
-                longitude=LONGITUDE,
-                language="pl",
-            )
-            current_conditions = await accuweather.async_get_current_conditions()
-            forecast_daily = await accuweather.async_get_daily_forecast(
-                days=5, metric=True
-            )
-            forecast_hourly = await accuweather.async_get_hourly_forecast(
-                hours=12, metric=True
-            )
-        except (
-            ApiError,
-            InvalidApiKeyError,
-            InvalidCoordinatesError,
-            ClientError,
-            RequestsExceededError,
-        ) as error:
-            print(f"Error: {error}")
-        else:
-            print(f"Location: {accuweather.location_name} ({accuweather.location_key})\n") #klucz lokacji accuweather
-            print(f"Requests remaining: {accuweather.requests_remaining}\n") #nwm ale jest konieczne (chyba) to chyba możliwe do wykonania requesty na aplikację
-            print(f"Current: {current_conditions}\n") #obecny stan pogody
-            print(f"Forecast: {forecast_daily}\n") #prognoza dzienna
-            print(f"Forecast hourly: {forecast_hourly}\n") #progrnoza godzinna
-
-
-loop = asyncio.new_event_loop()
-loop.run_until_complete(main())
-loop.close()
+observation = mgr.weather_at_coords(latitude, longitude)
+w = observation.weather
+                                 #wszystkie wartości poniżej są orientacyjne (tylko do format-check)
+print(w.detailed_status)         # 'clouds'
+#print(w.wind())                  # {'speed': 4.6, 'deg': 330}
+print(w.humidity)                # 87
+print(w.temperature('celsius')['temp'])  # {'temp_max': 10.5, 'temp': 9.7, 'temp_min': 9.0}
+print(w.temperature('celsius')['feels_like'])  # | - |
+#print(w.rain)                    # {}
+#print(w.heat_index)              # None
+print(w.clouds)                  # 75

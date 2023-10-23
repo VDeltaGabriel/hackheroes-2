@@ -1,4 +1,3 @@
-"""Example of usage."""
 import asyncio
 import logging
 
@@ -49,15 +48,20 @@ def GetWeather():
     observation = mgr.weather_at_coords(latitude, longitude)
     w = observation.weather
                                      #wszystkie wartości poniżej są orientacyjne (tylko do format-check)
-    print(w.detailed_status)         # 'clouds'
+    #print(w.detailed_status)         # 'clouds'
     DetailedStatus = w.detailed_status
     #print(w.wind())                  # {'speed': 4.6, 'deg': 330}
-    print(w.humidity)                # 87
-    print(w.temperature('celsius')['temp'])  # {'temp_max': 10.5, 'temp': 9.7, 'temp_min': 9.0}
+    
+                                      #print(w.humidity)                # 87
+    #print(w.temperature('celsius')['temp'])  # {'temp_max': 10.5, 'temp': 9.7, 'temp_min': 9.0}
     Temperature = w.temperature('celsius')['temp']
-    print(w.temperature('celsius')['feels_like']) # | - |            
+                                            #print(w.temperature('celsius')['feels_like']) # | - |            
     SensedTemperature = w.temperature('celsius')['feels_like']
     #print(w.rain)                    # {}
     #print(w.heat_index)              # None
-    print(w.clouds)                  # 75
+    #print(w.clouds)                  # 75
     return DetailedStatus, Temperature, SensedTemperature
+DetailedStatus, Temperature, SensedTemperature = GetWeather() # Przypisz zmienne do zmiennych funkcji i drukuj [DEBUG]
+print(DetailedStatus)
+print(Temperature)
+print(SensedTemperature)

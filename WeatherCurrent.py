@@ -1,4 +1,3 @@
-"""Example of usage."""
 import asyncio
 import logging
 
@@ -11,12 +10,44 @@ from accuweather import (
     InvalidCoordinatesError,
     RequestsExceededError,
 )
+import socket
+import requests
+from ip2geotools.databases.noncommercial import DbIpCity
+from geopy.distance import distance
+
+def get_ip_address():
+    url = 'https://api.ipify.org'
+    response = requests.get(url)
+    ip_address = response.text
+    return ip_address
+
+ip_address = get_ip_address()
+print("IP Address:", ip_address)
+
+def printDetails(ip):
+    res = DbIpCity.get(ip, api_key="free")
+    LATITUDE = res.latitude
+    LONGITUDE = res.longitude
+    arraytoget = [LATITUDE, LONGITUDE]
+    return(arraytoget)
+
+
+result = printDetails(ip_address)
+print(result[0])
+print(result[1])
+
+latitude = result[0]
+longitude = result[1]
 
 
 #cordy i api key (cordy zostają te same chyba że mamy sposób na wczytywanie obecnych)
-#ustawione na Katowice
-LATITUDE = 50.25833
-LONGITUDE = 19.0275
+#ustawione na Katowice EDIT: jest już skrypt do generowania geo
+#kordy Katowic zostawione w komentarzu dla testów
+#LATITUDE = 50.25833
+#LONGITUDE = 19.0275
+
+LATITUDE = latitude
+LONGITUDE = longitude
 API_KEY = "d8SNarC0KGzK45AAAZ9PAS1lzrLYm21U"
 
 logging.basicConfig(level=logging.DEBUG)
